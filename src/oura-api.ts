@@ -7,8 +7,8 @@ import {
     OuraUserInfo,
 } from "./types";
 
-// const OURA_API_URL = 'https://api.ouraring.com/v2/usercollection'
-const OURA_API_URL = 'https://api.ouraring.com/v2/sandbox/usercollection'
+const OURA_API_URL = 'https://api.ouraring.com/v2/usercollection'
+// const OURA_API_URL = 'https://api.ouraring.com/v2/sandbox/usercollection'
 
 export default class OuraApi {
     token: string | null
