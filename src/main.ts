@@ -182,8 +182,11 @@ export default class OuraPlugin extends Plugin {
 				let ouraText = ''
 
 				ouraText += replacePlaceholders(this.settings.sleepTemplate, stats);
+				ouraText += '\n';
 				ouraText += replacePlaceholders(this.settings.readinessTemplate, stats);
+				ouraText += '\n';
 				ouraText += replacePlaceholders(this.settings.activitiesTemplate, stats);
+				ouraText += '\n';
 
 				editor.replaceSelection(ouraText);
 

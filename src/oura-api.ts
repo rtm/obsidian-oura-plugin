@@ -9,6 +9,7 @@ import {
 } from "./types";
 
 const OURA_API_URL = 'https://api.ouraring.com/v2/usercollection'
+// const OURA_API_URL = 'https://api.ouraring.com/v2/sandbox/usercollection'
 
 export default class OuraApi {
     token: string | null
@@ -21,9 +22,9 @@ export default class OuraApi {
         if (this.token) {
             try {
                 const params = new URLSearchParams()
-                const start = moment(theDate).subtract(1, 'days').format('YYYY-MM-DD')
-                params.set('start_date', start)
-                params.set('end_date', theDate)
+                const end = moment(theDate).add(1, 'days').format('YYYY-MM-DD')
+                params.set('start_date', theDate)
+                params.set('end_date', end)
                 const data = await requestUrl({
                     url: `${OURA_API_URL}/daily_sleep?${params.toString()}`, headers: {
                         'Authorization': `Bearer ${this.token}`
