@@ -1,14 +1,15 @@
 import {Editor, MarkdownView, moment, Notice, Plugin} from 'obsidian';
 import OuraApi from "./oura-api";
-import {ActivitiesEntry, OuraPluginSettings, OuraRingStats, ReadinessEntry, SleepEntry} from "./types";
+import {ActivitiesEntry, OuraPluginSettings, OuraRingStats, ReadinessEntry, SleepEntry, SleepPeriodEntry} from "./types";
 import {OuraSettingTab} from "./settings";
-import {getToday} from "./utils";
+import {getToday, secondsToHMS, iso8601ToTime} from "./utils";
 
 
 const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats> => {
 	const ouraRingStats : OuraRingStats = {}
 
 	const sleepData = await api.getSleepData(day)
+	const sleepPeriodData = await api.getSleepPeriodData(day)
 	const readinessData = await api.getReadinessData(day)
 	const activityData = await api.getActivityData(day)
 
@@ -25,6 +26,29 @@ const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats>
 		ouraRingStats.sleep_contributors_restfulness = sleepEntry.contributors.restfulness;
 		ouraRingStats.sleep_contributors_timing = sleepEntry.contributors.timing;
 		ouraRingStats.sleep_contributors_total_sleep = sleepEntry.contributors.total_sleep;
+	}
+
+	if (sleepPeriodData && sleepPeriodData.data.length > 0) {
+		// Find the longest sleep period (primary sleep, not naps)
+		const periods = sleepPeriodData.data as SleepPeriodEntry[];
+		const sleepPeriod = periods.reduce((longest, current) =>
+			(current.total_sleep_duration ?? 0) > (longest.total_sleep_duration ?? 0) ? current : longest
+		, periods[0]);
+
+		if (sleepPeriod.total_sleep_duration != null) ouraRingStats.sleep_total_sleep_duration = secondsToHMS(sleepPeriod.total_sleep_duration);
+		if (sleepPeriod.deep_sleep_duration != null) ouraRingStats.sleep_deep_sleep_duration = secondsToHMS(sleepPeriod.deep_sleep_duration);
+		if (sleepPeriod.light_sleep_duration != null) ouraRingStats.sleep_light_sleep_duration = secondsToHMS(sleepPeriod.light_sleep_duration);
+		if (sleepPeriod.rem_sleep_duration != null) ouraRingStats.sleep_rem_sleep_duration = secondsToHMS(sleepPeriod.rem_sleep_duration);
+		if (sleepPeriod.awake_time != null) ouraRingStats.sleep_awake_time = secondsToHMS(sleepPeriod.awake_time);
+		if (sleepPeriod.time_in_bed != null) ouraRingStats.sleep_time_in_bed = secondsToHMS(sleepPeriod.time_in_bed);
+		if (sleepPeriod.bedtime_start) ouraRingStats.sleep_bedtime_start = iso8601ToTime(sleepPeriod.bedtime_start);
+		if (sleepPeriod.bedtime_end) ouraRingStats.sleep_bedtime_end = iso8601ToTime(sleepPeriod.bedtime_end);
+		if (sleepPeriod.efficiency != null) ouraRingStats.sleep_efficiency = sleepPeriod.efficiency;
+		if (sleepPeriod.latency != null) ouraRingStats.sleep_latency = sleepPeriod.latency;
+		if (sleepPeriod.average_heart_rate != null) ouraRingStats.sleep_average_heart_rate = sleepPeriod.average_heart_rate;
+		if (sleepPeriod.average_hrv != null) ouraRingStats.sleep_average_hrv = sleepPeriod.average_hrv;
+		if (sleepPeriod.lowest_heart_rate != null) ouraRingStats.sleep_lowest_heart_rate = sleepPeriod.lowest_heart_rate;
+		if (sleepPeriod.average_breath != null) ouraRingStats.sleep_average_breath = sleepPeriod.average_breath;
 	}
 
 	if (readinessData && readinessData.data.length > 0) {
@@ -88,14 +112,17 @@ const DEFAULT_SETTINGS: OuraPluginSettings = {
 	personalAccessToken: null,
 	sleepTemplate: `Sleep Day: $$sleep_day
 Sleep Score: $$sleep_score
-Sleep Timestamp: $$sleep_timestamp
-Deep Sleep: $$sleep_contributors_deep_sleep
-Efficiency: $$sleep_contributors_efficiency
-Latency: $$sleep_contributors_latency
-REM Sleep: $$sleep_contributors_rem_sleep
-Restfulness: $$sleep_contributors_restfulness
-Timing: $$sleep_contributors_timing
-Total Sleep: $$sleep_contributors_total_sleep`,
+Total Sleep: $$sleep_total_sleep_duration
+Deep Sleep: $$sleep_deep_sleep_duration
+Light Sleep: $$sleep_light_sleep_duration
+REM Sleep: $$sleep_rem_sleep_duration
+Awake Time: $$sleep_awake_time
+Time in Bed: $$sleep_time_in_bed
+Bedtime: $$sleep_bedtime_start - $$sleep_bedtime_end
+Efficiency: $$sleep_efficiency
+Avg Heart Rate: $$sleep_average_heart_rate
+Avg HRV: $$sleep_average_hrv
+Lowest Heart Rate: $$sleep_lowest_heart_rate`,
 	readinessTemplate: `Readiness Day: $$readiness_day
 Readiness Score: $$readiness_score
 Temperature Deviation: $$readiness_temperature_deviation
@@ -179,14 +206,12 @@ export default class OuraPlugin extends Plugin {
 
 				const stats : OuraRingStats = await fetchOuraStats(this.ouraApi, metricsForDay)
 
-				let ouraText = ''
-
-				ouraText += replacePlaceholders(this.settings.sleepTemplate, stats);
-				ouraText += '\n';
-				ouraText += replacePlaceholders(this.settings.readinessTemplate, stats);
-				ouraText += '\n';
-				ouraText += replacePlaceholders(this.settings.activitiesTemplate, stats);
-				ouraText += '\n';
+				const sections = [
+					replacePlaceholders(this.settings.sleepTemplate, stats),
+					replacePlaceholders(this.settings.readinessTemplate, stats),
+					replacePlaceholders(this.settings.activitiesTemplate, stats),
+				].filter(s => s.length > 0);
+				const ouraText = sections.join('\n') + '\n';
 
 				editor.replaceSelection(ouraText);
 

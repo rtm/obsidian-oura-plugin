@@ -3,6 +3,7 @@ import {
     ActivitiesEntry,
     ReadinessEntry,
     SleepEntry,
+    SleepPeriodEntry,
     OuraResponse,
     OuraUserInfo,
 } from "./types";
@@ -21,9 +22,9 @@ export default class OuraApi {
         if (this.token) {
             try {
                 const params = new URLSearchParams()
-                const end = moment(theDate).add(1, 'days').format('YYYY-MM-DD')
-                params.set('start_date', theDate)
-                params.set('end_date', end)
+                const start = moment(theDate).subtract(1, 'days').format('YYYY-MM-DD')
+                params.set('start_date', start)
+                params.set('end_date', theDate)
                 const data = await requestUrl({
                     url: `${OURA_API_URL}/daily_sleep?${params.toString()}`, headers: {
                         'Authorization': `Bearer ${this.token}`
@@ -52,6 +53,51 @@ export default class OuraApi {
                 };
             } catch (e) {
                 console.error('Error fetching sleep entries:', e);
+                return null;
+            }
+        }
+        return null
+    }
+
+    public async getSleepPeriodData(theDate: string): Promise<OuraResponse | null> {
+        if (this.token) {
+            try {
+                const params = new URLSearchParams()
+                const start = moment(theDate).subtract(1, 'days').format('YYYY-MM-DD')
+                params.set('start_date', start)
+                params.set('end_date', theDate)
+                const data = await requestUrl({
+                    url: `${OURA_API_URL}/sleep?${params.toString()}`, headers: {
+                        'Authorization': `Bearer ${this.token}`
+                    }
+                })
+
+                const sleepPeriodEntries: SleepPeriodEntry[] = data.json.data.map((entry: SleepPeriodEntry) => ({
+                    id: entry.id,
+                    day: entry.day,
+                    type: entry.type,
+                    bedtime_start: entry.bedtime_start,
+                    bedtime_end: entry.bedtime_end,
+                    total_sleep_duration: entry.total_sleep_duration,
+                    deep_sleep_duration: entry.deep_sleep_duration,
+                    light_sleep_duration: entry.light_sleep_duration,
+                    rem_sleep_duration: entry.rem_sleep_duration,
+                    awake_time: entry.awake_time,
+                    time_in_bed: entry.time_in_bed,
+                    efficiency: entry.efficiency,
+                    latency: entry.latency,
+                    average_heart_rate: entry.average_heart_rate,
+                    average_hrv: entry.average_hrv,
+                    lowest_heart_rate: entry.lowest_heart_rate,
+                    average_breath: entry.average_breath,
+                }));
+
+                return {
+                    data: sleepPeriodEntries,
+                    next_token: data.json.next_token,
+                };
+            } catch (e) {
+                console.error('Error fetching sleep period entries:', e);
                 return null;
             }
         }

@@ -15,7 +15,7 @@ export interface OuraPluginSettings {
 }
 
 export interface OuraResponse {
-  data: SleepEntry[] | ReadinessEntry[] | ActivitiesEntry[],
+  data: SleepEntry[] | SleepPeriodEntry[] | ReadinessEntry[] | ActivitiesEntry[],
   next_token: string | null;
 }
 
@@ -35,6 +35,26 @@ export interface SleepEntryContributors {
   restfulness: number;
   timing: number;
   total_sleep: number;
+}
+
+export interface SleepPeriodEntry {
+  id: string;
+  day: string;
+  type: string;
+  bedtime_start: string;
+  bedtime_end: string;
+  total_sleep_duration: number | null;
+  deep_sleep_duration: number | null;
+  light_sleep_duration: number | null;
+  rem_sleep_duration: number | null;
+  awake_time: number | null;
+  time_in_bed: number | null;
+  efficiency: number | null;
+  latency: number | null;
+  average_heart_rate: number | null;
+  average_hrv: number | null;
+  lowest_heart_rate: number | null;
+  average_breath: number | null;
 }
 
 export interface ReadinessEntry {
@@ -113,6 +133,21 @@ export interface OuraRingStats {
   sleep_contributors_restfulness?: number;
   sleep_contributors_timing?: number;
   sleep_contributors_total_sleep?: number;
+
+  sleep_total_sleep_duration?: string;
+  sleep_deep_sleep_duration?: string;
+  sleep_light_sleep_duration?: string;
+  sleep_rem_sleep_duration?: string;
+  sleep_awake_time?: string;
+  sleep_time_in_bed?: string;
+  sleep_bedtime_start?: string;
+  sleep_bedtime_end?: string;
+  sleep_efficiency?: number;
+  sleep_latency?: number;
+  sleep_average_heart_rate?: number;
+  sleep_average_hrv?: number;
+  sleep_lowest_heart_rate?: number;
+  sleep_average_breath?: number;
 
   activities_class_5_min?: string;
   activities_score?: number;
