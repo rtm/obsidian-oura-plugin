@@ -16,10 +16,10 @@ const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats>
 	]);
 
 	const missing: string[] = [];
-	if (!sleepData || sleepData.data.length === 0) missing.push('sleep');
-	if (!sleepPeriodData || sleepPeriodData.data.length === 0) missing.push('sleep period');
-	if (!readinessData || readinessData.data.length === 0) missing.push('readiness');
-	if (!activityData || activityData.data.length === 0) missing.push('activity');
+	if (!sleepData?.data.length) missing.push('sleep');
+	if (!sleepPeriodData?.data.length) missing.push('sleep period');
+	if (!readinessData?.data.length) missing.push('readiness');
+	if (!activityData?.data.length) missing.push('activity');
 	if (missing.length > 0) {
 		new Notice(`Oura: No ${missing.join(', ')} data available for ${day}`);
 	}
