@@ -15,7 +15,7 @@ export interface OuraPluginSettings {
 }
 
 export interface OuraResponse {
-  data: SleepEntry[] | ReadinessEntry[] | ActivitiesEntry[],
+  data: SleepEntry[] | SleepRouteEntry[] | ReadinessEntry[] | ActivitiesEntry[],
   next_token: string | null;
 }
 
@@ -35,6 +35,45 @@ export interface SleepEntryContributors {
   restfulness: number;
   timing: number;
   total_sleep: number;
+}
+
+export interface SleepRouteReadiness {
+  contributors: ReadinessEntryContributors & { sleep_regularity: number };
+  score: number;
+  temperature_deviation: number;
+  temperature_trend_deviation: number;
+}
+
+export interface SleepRouteEntry {
+  id: string;
+  average_breath: number;
+  average_heart_rate: number;
+  average_hrv: number;
+  awake_time: number;
+  bedtime_end: string;
+  bedtime_start: string;
+  day: string;
+  deep_sleep_duration: number;
+  efficiency: number;
+  heart_rate: ActivitiesMet;
+  hrv: ActivitiesMet;
+  latency: number;
+  light_sleep_duration: number;
+  low_battery_alert: boolean;
+  lowest_heart_rate: number;
+  movement_30_sec: string;
+  period: number;
+  readiness: SleepRouteReadiness;
+  readiness_score_delta: number;
+  rem_sleep_duration: number;
+  restless_periods: number;
+  sleep_phase_5_min: string;
+  sleep_score_delta: number;
+  sleep_algorithm_version: string;
+  sleep_analysis_reason: string;
+  time_in_bed: number;
+  total_sleep_duration: number;
+  type: string;
 }
 
 export interface ReadinessEntry {
