@@ -3,7 +3,7 @@ import {
     ActivitiesEntry,
     ReadinessEntry,
     SleepEntry,
-    SleepPeriodEntry,
+    SleepRouteEntry,
     OuraResponse,
     OuraUserInfo,
 } from "./types";
@@ -59,7 +59,7 @@ export default class OuraApi {
         return null
     }
 
-    public async getSleepPeriodData(theDate: string): Promise<OuraResponse | null> {
+    public async getSleepRouteData(theDate: string): Promise<OuraResponse | null> {
         if (this.token) {
             try {
                 const params = new URLSearchParams()
@@ -72,32 +72,66 @@ export default class OuraApi {
                     }
                 })
 
-                const sleepPeriodEntries: SleepPeriodEntry[] = data.json.data.map((entry: SleepPeriodEntry) => ({
+                const sleepRouteEntries: SleepRouteEntry[] = data.json.data.map((entry: SleepRouteEntry) => ({
                     id: entry.id,
-                    day: entry.day,
-                    type: entry.type,
-                    bedtime_start: entry.bedtime_start,
-                    bedtime_end: entry.bedtime_end,
-                    total_sleep_duration: entry.total_sleep_duration,
-                    deep_sleep_duration: entry.deep_sleep_duration,
-                    light_sleep_duration: entry.light_sleep_duration,
-                    rem_sleep_duration: entry.rem_sleep_duration,
-                    awake_time: entry.awake_time,
-                    time_in_bed: entry.time_in_bed,
-                    efficiency: entry.efficiency,
-                    latency: entry.latency,
+                    average_breath: entry.average_breath,
                     average_heart_rate: entry.average_heart_rate,
                     average_hrv: entry.average_hrv,
+                    awake_time: entry.awake_time,
+                    bedtime_end: entry.bedtime_end,
+                    bedtime_start: entry.bedtime_start,
+                    day: entry.day,
+                    deep_sleep_duration: entry.deep_sleep_duration,
+                    efficiency: entry.efficiency,
+                    heart_rate: {
+                        interval: entry.heart_rate.interval,
+                        items: entry.heart_rate.items,
+                        timestamp: entry.heart_rate.timestamp,
+                    },
+                    hrv: {
+                        interval: entry.hrv.interval,
+                        items: entry.hrv.items,
+                        timestamp: entry.hrv.timestamp,
+                    },
+                    latency: entry.latency,
+                    light_sleep_duration: entry.light_sleep_duration,
+                    low_battery_alert: entry.low_battery_alert,
                     lowest_heart_rate: entry.lowest_heart_rate,
-                    average_breath: entry.average_breath,
+                    movement_30_sec: entry.movement_30_sec,
+                    period: entry.period,
+                    readiness: {
+                        contributors: {
+                            activity_balance: entry.readiness.contributors.activity_balance,
+                            body_temperature: entry.readiness.contributors.body_temperature,
+                            hrv_balance: entry.readiness.contributors.hrv_balance,
+                            previous_day_activity: entry.readiness.contributors.previous_day_activity,
+                            previous_night: entry.readiness.contributors.previous_night,
+                            recovery_index: entry.readiness.contributors.recovery_index,
+                            resting_heart_rate: entry.readiness.contributors.resting_heart_rate,
+                            sleep_balance: entry.readiness.contributors.sleep_balance,
+                            sleep_regularity: entry.readiness.contributors.sleep_regularity,
+                        },
+                        score: entry.readiness.score,
+                        temperature_deviation: entry.readiness.temperature_deviation,
+                        temperature_trend_deviation: entry.readiness.temperature_trend_deviation,
+                    },
+                    readiness_score_delta: entry.readiness_score_delta,
+                    rem_sleep_duration: entry.rem_sleep_duration,
+                    restless_periods: entry.restless_periods,
+                    sleep_phase_5_min: entry.sleep_phase_5_min,
+                    sleep_score_delta: entry.sleep_score_delta,
+                    sleep_algorithm_version: entry.sleep_algorithm_version,
+                    sleep_analysis_reason: entry.sleep_analysis_reason,
+                    time_in_bed: entry.time_in_bed,
+                    total_sleep_duration: entry.total_sleep_duration,
+                    type: entry.type,
                 }));
 
                 return {
-                    data: sleepPeriodEntries,
+                    data: sleepRouteEntries,
                     next_token: data.json.next_token,
                 };
             } catch (e) {
-                console.error('Error fetching sleep period entries:', e);
                 return null;
             }
         }

@@ -12,10 +12,11 @@ export interface OuraPluginSettings {
   sleepTemplate: string;
   readinessTemplate: string;
   activitiesTemplate: string;
+  autoInsert: boolean;
 }
 
 export interface OuraResponse {
-  data: SleepEntry[] | SleepPeriodEntry[] | ReadinessEntry[] | ActivitiesEntry[],
+  data: SleepEntry[] | SleepRouteEntry[] | ReadinessEntry[] | ActivitiesEntry[],
   next_token: string | null;
 }
 
@@ -37,24 +38,43 @@ export interface SleepEntryContributors {
   total_sleep: number;
 }
 
-export interface SleepPeriodEntry {
+export interface SleepRouteReadiness {
+  contributors: ReadinessEntryContributors & { sleep_regularity: number };
+  score: number;
+  temperature_deviation: number;
+  temperature_trend_deviation: number;
+}
+
+export interface SleepRouteEntry {
   id: string;
-  day: string;
-  type: string;
-  bedtime_start: string;
+  average_breath: number;
+  average_heart_rate: number;
+  average_hrv: number;
+  awake_time: number;
   bedtime_end: string;
-  total_sleep_duration: number | null;
-  deep_sleep_duration: number | null;
-  light_sleep_duration: number | null;
-  rem_sleep_duration: number | null;
-  awake_time: number | null;
-  time_in_bed: number | null;
-  efficiency: number | null;
-  latency: number | null;
-  average_heart_rate: number | null;
-  average_hrv: number | null;
-  lowest_heart_rate: number | null;
-  average_breath: number | null;
+  bedtime_start: string;
+  day: string;
+  deep_sleep_duration: number;
+  efficiency: number;
+  heart_rate: ActivitiesMet;
+  hrv: ActivitiesMet;
+  latency: number;
+  light_sleep_duration: number;
+  low_battery_alert: boolean;
+  lowest_heart_rate: number;
+  movement_30_sec: string;
+  period: number;
+  readiness: SleepRouteReadiness;
+  readiness_score_delta: number;
+  rem_sleep_duration: number;
+  restless_periods: number;
+  sleep_phase_5_min: string;
+  sleep_score_delta: number;
+  sleep_algorithm_version: string;
+  sleep_analysis_reason: string;
+  time_in_bed: number;
+  total_sleep_duration: number;
+  type: string;
 }
 
 export interface ReadinessEntry {

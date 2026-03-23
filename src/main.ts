@@ -1,6 +1,6 @@
 import {Editor, MarkdownView, moment, Notice, Plugin} from 'obsidian';
 import OuraApi from "./oura-api";
-import {ActivitiesEntry, OuraPluginSettings, OuraRingStats, ReadinessEntry, SleepEntry, SleepPeriodEntry} from "./types";
+import {ActivitiesEntry, OuraPluginSettings, OuraRingStats, ReadinessEntry, SleepEntry, SleepRouteEntry} from "./types";
 import {OuraSettingTab} from "./settings";
 import {getToday, secondsToHMS, iso8601ToTime} from "./utils";
 
@@ -8,13 +8,24 @@ import {getToday, secondsToHMS, iso8601ToTime} from "./utils";
 const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats> => {
 	const ouraRingStats : OuraRingStats = {}
 
-	const sleepData = await api.getSleepData(day)
-	const sleepPeriodData = await api.getSleepPeriodData(day)
-	const readinessData = await api.getReadinessData(day)
-	const activityData = await api.getActivityData(day)
+	const [sleepData, sleepPeriodData, readinessData, activityData] = await Promise.all([
+		api.getSleepData(day),
+		api.getSleepRouteData(day),
+		api.getReadinessData(day),
+		api.getActivityData(day),
+	]);
+
+	const missing: string[] = [];
+	if (!sleepData || sleepData.data.length === 0) missing.push('sleep');
+	if (!sleepPeriodData || sleepPeriodData.data.length === 0) missing.push('sleep period');
+	if (!readinessData || readinessData.data.length === 0) missing.push('readiness');
+	if (!activityData || activityData.data.length === 0) missing.push('activity');
+	if (missing.length > 0) {
+		new Notice(`Oura: No ${missing.join(', ')} data available for ${day}`);
+	}
 
 	if (sleepData && sleepData.data.length > 0) {
-		const sleepEntry = sleepData.data[0] as SleepEntry;
+		const sleepEntry = sleepData.data[sleepData.data.length - 1] as SleepEntry;
 
 		ouraRingStats.sleep_day = sleepEntry.day;
 		ouraRingStats.sleep_score = sleepEntry.score;
@@ -29,11 +40,16 @@ const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats>
 	}
 
 	if (sleepPeriodData && sleepPeriodData.data.length > 0) {
-		// Find the longest sleep period (primary sleep, not naps)
-		const periods = sleepPeriodData.data as SleepPeriodEntry[];
-		const sleepPeriod = periods.reduce((longest, current) =>
-			(current.total_sleep_duration ?? 0) > (longest.total_sleep_duration ?? 0) ? current : longest
-		, periods[0]);
+		// Match sleep period to the same day as the daily sleep score
+		const allPeriods = sleepPeriodData.data as SleepRouteEntry[];
+		const matchDay = ouraRingStats.sleep_day || day;
+		const dayPeriods = allPeriods.filter(p => p.day === matchDay);
+		// Fall back to the last (most recent) period if no day match
+		const sleepPeriod = dayPeriods.length > 0
+			? dayPeriods.reduce((longest, current) =>
+				(current.total_sleep_duration ?? 0) > (longest.total_sleep_duration ?? 0) ? current : longest
+			, dayPeriods[0])
+			: allPeriods[allPeriods.length - 1];
 
 		if (sleepPeriod.total_sleep_duration != null) ouraRingStats.sleep_total_sleep_duration = secondsToHMS(sleepPeriod.total_sleep_duration);
 		if (sleepPeriod.deep_sleep_duration != null) ouraRingStats.sleep_deep_sleep_duration = secondsToHMS(sleepPeriod.deep_sleep_duration);
@@ -52,7 +68,7 @@ const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats>
 	}
 
 	if (readinessData && readinessData.data.length > 0) {
-		const readinessEntry = readinessData.data[0] as ReadinessEntry;
+		const readinessEntry = readinessData.data[readinessData.data.length - 1] as ReadinessEntry;
 
 		ouraRingStats.readiness_day = readinessEntry.day;
 		ouraRingStats.readiness_score = readinessEntry.score;
@@ -70,7 +86,7 @@ const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats>
 	}
 
 	if (activityData && activityData.data.length > 0) {
-		const activitiesEntry = activityData.data[0] as ActivitiesEntry;
+		const activitiesEntry = activityData.data[activityData.data.length - 1] as ActivitiesEntry;
 
 		ouraRingStats.activities_class_5_min = activitiesEntry.class_5_min;
 		ouraRingStats.activities_score = activitiesEntry.score;
@@ -168,6 +184,7 @@ Recovery Time: $$activities_contributors_recovery_time
 Stay Active: $$activities_contributors_stay_active
 Training Frequency: $$activities_contributors_training_frequency
 Training Volume: $$activities_contributors_training_volume`,
+	autoInsert: true,
 }
 
 function replacePlaceholders(template: string, data: OuraRingStats) {
