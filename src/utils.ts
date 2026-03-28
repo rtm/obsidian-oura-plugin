@@ -16,8 +16,7 @@ const minutesToHMS = (minutes: number): string => {
 export const secondsToHMS = (seconds: number): string => {
   const hours = Math.floor(seconds / 60 / 60)
   const minutes = Math.floor(seconds / 60) % 60
-  const secs = seconds % 60
-  return `${numeral(hours).format('00')}:${numeral(minutes).format('00')}:${numeral(secs).format('00')}`
+  return `${numeral(hours).format('00')}:${numeral(minutes).format('00')}`
 }
 
 export function autoResizeTextArea(textarea: HTMLTextAreaElement): void {

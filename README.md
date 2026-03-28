@@ -18,12 +18,12 @@ and copy the token into the settings for this plugin
 | Sleep Day              | sleep_day                             | 2024-03-21   |
 | Sleep Score            | sleep_score                           | 86           |
 | Sleep Timestamp        | sleep_timestamp                       |              |
-| Total Sleep Duration   | sleep_total_sleep_duration            | 06:50:00     |
-| Deep Sleep Duration    | sleep_deep_sleep_duration             | 01:23:00     |
-| Light Sleep Duration   | sleep_light_sleep_duration            | 03:15:00     |
-| REM Sleep Duration     | sleep_rem_sleep_duration              | 02:12:00     |
-| Awake Time             | sleep_awake_time                      | 00:35:00     |
-| Time in Bed            | sleep_time_in_bed                     | 07:25:00     |
+| Total Sleep Duration   | sleep_total_sleep_duration            | 06:50        |
+| Deep Sleep Duration    | sleep_deep_sleep_duration             | 01:23        |
+| Light Sleep Duration   | sleep_light_sleep_duration            | 03:15        |
+| REM Sleep Duration     | sleep_rem_sleep_duration              | 02:12        |
+| Awake Time             | sleep_awake_time                      | 00:35        |
+| Time in Bed            | sleep_time_in_bed                     | 07:25        |
 | Bedtime Start          | sleep_bedtime_start                   | 23:15:00     |
 | Bedtime End            | sleep_bedtime_end                     | 06:40:00     |
 | Sleep Efficiency       | sleep_efficiency                      | 92           |

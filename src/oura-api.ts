@@ -23,8 +23,9 @@ export default class OuraApi {
             try {
                 const params = new URLSearchParams()
                 const start = moment(theDate).subtract(1, 'days').format('YYYY-MM-DD')
+                const end = moment(theDate).add(1, 'days').format('YYYY-MM-DD')
                 params.set('start_date', start)
-                params.set('end_date', theDate)
+                params.set('end_date', end)
                 const data = await requestUrl({
                     url: `${OURA_API_URL}/daily_sleep?${params.toString()}`, headers: {
                         'Authorization': `Bearer ${this.token}`
@@ -64,8 +65,9 @@ export default class OuraApi {
             try {
                 const params = new URLSearchParams()
                 const start = moment(theDate).subtract(1, 'days').format('YYYY-MM-DD')
+                const end = moment(theDate).add(1, 'days').format('YYYY-MM-DD')
                 params.set('start_date', start)
-                params.set('end_date', theDate)
+                params.set('end_date', end)
                 const data = await requestUrl({
                     url: `${OURA_API_URL}/sleep?${params.toString()}`, headers: {
                         'Authorization': `Bearer ${this.token}`
@@ -143,8 +145,9 @@ export default class OuraApi {
             try {
                 const params = new URLSearchParams()
                 const start = moment(theDate).subtract(1, 'days').format('YYYY-MM-DD')
+                const end = moment(theDate).add(1, 'days').format('YYYY-MM-DD')
                 params.set('start_date', start)
-                params.set('end_date', theDate)
+                params.set('end_date', end)
                 const data = await requestUrl({
                     url: `${OURA_API_URL}/daily_activity?${params.toString()}`, headers: {
                         'Authorization': `Bearer ${this.token}`
@@ -207,8 +210,9 @@ export default class OuraApi {
             try {
                 const params = new URLSearchParams()
                 const start = moment(theDate).subtract(1, 'days').format('YYYY-MM-DD')
+                const end = moment(theDate).add(1, 'days').format('YYYY-MM-DD')
                 params.set('start_date', start)
-                params.set('end_date', theDate)
+                params.set('end_date', end)
                 const data = await requestUrl({
                     url: `${OURA_API_URL}/daily_readiness?${params.toString()}`, headers: {
                         'Authorization': `Bearer ${this.token}`
