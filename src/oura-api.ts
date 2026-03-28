@@ -85,16 +85,16 @@ export default class OuraApi {
                     day: entry.day,
                     deep_sleep_duration: entry.deep_sleep_duration,
                     efficiency: entry.efficiency,
-                    heart_rate: {
+                    heart_rate: entry.heart_rate ? {
                         interval: entry.heart_rate.interval,
                         items: entry.heart_rate.items,
                         timestamp: entry.heart_rate.timestamp,
-                    },
-                    hrv: {
+                    } : null,
+                    hrv: entry.hrv ? {
                         interval: entry.hrv.interval,
                         items: entry.hrv.items,
                         timestamp: entry.hrv.timestamp,
-                    },
+                    } : null,
                     latency: entry.latency,
                     light_sleep_duration: entry.light_sleep_duration,
                     low_battery_alert: entry.low_battery_alert,
