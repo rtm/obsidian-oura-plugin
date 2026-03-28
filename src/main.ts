@@ -2,7 +2,7 @@ import {Editor, MarkdownView, moment, Notice, Plugin} from 'obsidian';
 import OuraApi from "./oura-api";
 import {ActivitiesEntry, OuraPluginSettings, OuraRingStats, ReadinessEntry, SleepEntry, SleepRouteEntry} from "./types";
 import {OuraSettingTab} from "./settings";
-import {getToday, secondsToHMS, iso8601ToTime} from "./utils";
+import {getToday, secondsToHM, iso8601ToTime} from "./utils";
 
 
 const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats> => {
@@ -51,12 +51,12 @@ const fetchOuraStats = async (api: OuraApi, day: string): Promise<OuraRingStats>
 			, dayPeriods[0])
 			: allPeriods[allPeriods.length - 1];
 
-		if (sleepPeriod.total_sleep_duration != null) ouraRingStats.sleep_total_sleep_duration = secondsToHMS(sleepPeriod.total_sleep_duration);
-		if (sleepPeriod.deep_sleep_duration != null) ouraRingStats.sleep_deep_sleep_duration = secondsToHMS(sleepPeriod.deep_sleep_duration);
-		if (sleepPeriod.light_sleep_duration != null) ouraRingStats.sleep_light_sleep_duration = secondsToHMS(sleepPeriod.light_sleep_duration);
-		if (sleepPeriod.rem_sleep_duration != null) ouraRingStats.sleep_rem_sleep_duration = secondsToHMS(sleepPeriod.rem_sleep_duration);
-		if (sleepPeriod.awake_time != null) ouraRingStats.sleep_awake_time = secondsToHMS(sleepPeriod.awake_time);
-		if (sleepPeriod.time_in_bed != null) ouraRingStats.sleep_time_in_bed = secondsToHMS(sleepPeriod.time_in_bed);
+		if (sleepPeriod.total_sleep_duration != null) ouraRingStats.sleep_total_sleep_duration = secondsToHM(sleepPeriod.total_sleep_duration);
+		if (sleepPeriod.deep_sleep_duration != null) ouraRingStats.sleep_deep_sleep_duration = secondsToHM(sleepPeriod.deep_sleep_duration);
+		if (sleepPeriod.light_sleep_duration != null) ouraRingStats.sleep_light_sleep_duration = secondsToHM(sleepPeriod.light_sleep_duration);
+		if (sleepPeriod.rem_sleep_duration != null) ouraRingStats.sleep_rem_sleep_duration = secondsToHM(sleepPeriod.rem_sleep_duration);
+		if (sleepPeriod.awake_time != null) ouraRingStats.sleep_awake_time = secondsToHM(sleepPeriod.awake_time);
+		if (sleepPeriod.time_in_bed != null) ouraRingStats.sleep_time_in_bed = secondsToHM(sleepPeriod.time_in_bed);
 		if (sleepPeriod.bedtime_start) ouraRingStats.sleep_bedtime_start = iso8601ToTime(sleepPeriod.bedtime_start);
 		if (sleepPeriod.bedtime_end) ouraRingStats.sleep_bedtime_end = iso8601ToTime(sleepPeriod.bedtime_end);
 		if (sleepPeriod.efficiency != null) ouraRingStats.sleep_efficiency = sleepPeriod.efficiency;
