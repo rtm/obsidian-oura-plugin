@@ -1,6 +1,6 @@
 {
-	"id": "obsidian-oura-plugin",
-	"name": "Oura Ring",
+	"id": "obsidian-oura-plugin-bobmyers",
+	"name": "Oura Ring (custom)",
 	"version": "0.2.3",
 	"minAppVersion": "1.5.12",
 	"description": "A plugin for importing Oura Ring data from the Cloud-based API",
